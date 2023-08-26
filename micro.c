@@ -1,3 +1,5 @@
+#include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
@@ -15,7 +17,8 @@ void enableRawMode() {
   tcgetattr(STDIN_FILENO, &orig_termios);
   atexit(disableRawMode);
 
-  // update original attributes, disable echoing input and read input byte-by-byte
+  // update original attributes, disable echoing input and read input
+  // byte-by-byte
   struct termios raw = orig_termios;
   raw.c_lflag &= ~(ECHO | ICANON);
 
@@ -27,6 +30,15 @@ int main() {
 
   // read input from the terminal
   char c;
-  while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q');
+  while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
+    if (iscntrl(c)) {
+      // print the ascii code of the character pressed
+      printf("%d\n", c);
+    } else {
+      // print the character it represents if it isn't a control character
+      printf("%d ('%c')\n", c, c);
+    }
+  }
+
   return 0;
 }
