@@ -2,16 +2,20 @@
 #include <termios.h>
 #include <unistd.h>
 
+// original terminal attributes
 struct termios orig_termios;
 
 void disableRawMode() {
+  // reset terminal to original attributes when disabling raw mode
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
 void enableRawMode() {
+  // disable raw mode when exiting (from main, or from the exit function)
   tcgetattr(STDIN_FILENO, &orig_termios);
   atexit(disableRawMode);
 
+  // update original attributes, disable echoing input and read input byte-by-byte
   struct termios raw = orig_termios;
   raw.c_lflag &= ~(ECHO | ICANON);
 
@@ -21,6 +25,7 @@ void enableRawMode() {
 int main() {
   enableRawMode();
 
+  // read input from the terminal
   char c;
   while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q');
   return 0;
