@@ -20,7 +20,7 @@ void enableRawMode() {
   // update original attributes, disable echoing input and read input
   // byte-by-byte
   struct termios raw = orig_termios;
-  raw.c_lflag &= ~(ECHO | ICANON);
+  raw.c_lflag &= ~(ECHO | ICANON | ISIG);
 
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
